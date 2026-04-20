@@ -1,12 +1,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-using System.Collections.Generic;
-using UnityEngine;
-
 public class FloorSpawnerLogic : MonoBehaviour
 {
-    public enum GenerationPhase
+    public enum TilePhase
     {
         Normal,
         BossEntrance,
@@ -14,23 +11,24 @@ public class FloorSpawnerLogic : MonoBehaviour
         BossExit
     }
 
-    [Header("Normal Floor Settings")]
+    [Header("Normal Tile")]
     public GameObject normalFloorTilePrefab;
 
-    [Header("Boss Floor Settings")]
+    [Header("Boss Tiles")]
     public GameObject bossEntranceTilePrefab;
     public GameObject bossMiddleTilePrefab;
     public GameObject bossExitTilePrefab;
 
-    [Header("Spawner Settings")]
+    [Header("Floor Settings")]
     public int floorCount = 5;
     public float floorLength = 30f;
     public float spawnX = -5f;
     public float spawnY = 0f;
     public float spawnStartZ = 0f;
 
-    [Header("Current Phase")]
-    public GenerationPhase currentPhase = GenerationPhase.Normal;
+    [Header("Boss Phase")]
+    public TilePhase currentPhase = TilePhase.Normal;
+    public bool bossFightActive = false;
 
     private List<GameObject> floorTiles = new List<GameObject>();
 
@@ -49,7 +47,7 @@ public class FloorSpawnerLogic : MonoBehaviour
     {
         floorTiles.RemoveAll(tile => tile == null);
 
-        while (floorTiles.Count < floorCount)
+        if (floorTiles.Count < floorCount)
         {
             float furthestBackZ = GetFurthestBackMovingTileZ();
             float newZ = furthestBackZ - floorLength;
@@ -63,7 +61,7 @@ public class FloorSpawnerLogic : MonoBehaviour
 
         if (prefabToSpawn == null)
         {
-            Debug.LogWarning("No tile prefab assigned for current phase.");
+            Debug.LogWarning("No floor tile prefab assigned for phase: " + currentPhase);
             return;
         }
 
@@ -76,22 +74,27 @@ public class FloorSpawnerLogic : MonoBehaviour
 
     GameObject GetNextTilePrefab()
     {
-        if (currentPhase == GenerationPhase.Normal)
+        if (currentPhase == TilePhase.Normal)
         {
             return normalFloorTilePrefab;
         }
-        else if (currentPhase == GenerationPhase.BossEntrance)
+
+        if (currentPhase == TilePhase.BossEntrance)
         {
-            currentPhase = GenerationPhase.BossMiddle;
+            currentPhase = TilePhase.BossMiddle;
+            bossFightActive = true;
             return bossEntranceTilePrefab;
         }
-        else if (currentPhase == GenerationPhase.BossMiddle)
+
+        if (currentPhase == TilePhase.BossMiddle)
         {
             return bossMiddleTilePrefab;
         }
-        else if (currentPhase == GenerationPhase.BossExit)
+
+        if (currentPhase == TilePhase.BossExit)
         {
-            currentPhase = GenerationPhase.Normal;
+            currentPhase = TilePhase.Normal;
+            bossFightActive = false;
             return bossExitTilePrefab;
         }
 
@@ -104,7 +107,10 @@ public class FloorSpawnerLogic : MonoBehaviour
 
         foreach (GameObject tile in floorTiles)
         {
-            if (tile == null) continue;
+            if (tile == null)
+            {
+                continue;
+            }
 
             Transform movingTile = tile.transform.Find("MovingTile");
 
@@ -122,13 +128,13 @@ public class FloorSpawnerLogic : MonoBehaviour
         return furthestBackZ;
     }
 
-    public void StartBossPhase()
+    public void StartBossTunnelPhase()
     {
-        currentPhase = GenerationPhase.BossEntrance;
+        currentPhase = TilePhase.BossEntrance;
     }
 
-    public void EndBossPhase()
+    public void EndBossTunnelPhase()
     {
-        currentPhase = GenerationPhase.BossExit;
+        currentPhase = TilePhase.BossExit;
     }
 }

@@ -119,6 +119,52 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &17178705
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 17178707}
+  - component: {fileID: 17178706}
+  m_Layer: 0
+  m_Name: BossEnvironment
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &17178706
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 17178705}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d85071d299421b84a99c9d72ea21d693, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BossEnvironmentLogic
+  underwaterVolume: {fileID: 0}
+  bubbleParticles: {fileID: 0}
+--- !u!4 &17178707
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 17178705}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -8.27656, y: 0, z: 16.03587}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &17323421
 GameObject:
   m_ObjectHideFlags: 0
@@ -736,6 +782,8 @@ MonoBehaviour:
   moveZ: 0
   playerSpeed: 10
   jumpForce: 10
+  isInBossWaterPhase: 0
+  waterSurfaceY: 0.72
 --- !u!1 &178132816
 GameObject:
   m_ObjectHideFlags: 0
@@ -1758,12 +1806,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 523814d75e8849f4f8c9b8e25a40449c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  floorTilePrefab: {fileID: 4169498534549526967, guid: d82ebb6763a8bc646b322c61d5df241f, type: 3}
+  normalFloorTilePrefab: {fileID: 4169498534549526967, guid: d82ebb6763a8bc646b322c61d5df241f, type: 3}
+  bossEntranceTilePrefab: {fileID: 2889325131114095920, guid: a629da9c26ebc094f8d7ab6191e551e9, type: 3}
+  bossMiddleTilePrefab: {fileID: 4010336324161280029, guid: 2438a96a1d7a7de458c4735ea2f2b12b, type: 3}
+  bossExitTilePrefab: {fileID: 5411457150468359109, guid: d06788fafc1f7f74f881e81ff5ba9fb0, type: 3}
   floorCount: 5
   floorLength: 30
-  spawnX: -5
+  spawnX: -6.7
   spawnY: 0
   spawnStartZ: 10
+  currentPhase: 0
+  bossFightActive: 0
 --- !u!4 &717489217
 Transform:
   m_ObjectHideFlags: 0
@@ -2587,6 +2640,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5f97b03646f4cda41a18d2ad481008e6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
+  bossPrefab: {fileID: 1583986333556517968, guid: b155acb13a164bb40af8e3b56b5c37da, type: 3}
+  player: {fileID: 110779113}
+  bossEnvironment: {fileID: 17178706}
+  spawnDistanceAhead: -20
+  spawnHeight: 3
 --- !u!4 &1378291838
 Transform:
   m_ObjectHideFlags: 0
@@ -2599,7 +2657,8 @@ Transform:
   m_LocalPosition: {x: -5.1875, y: -0, z: 5.8}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 1558124498}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1383776815
@@ -2683,13 +2742,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1558124496}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -5.31677, y: -0, z: 12.46196}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -0.12927008, y: 0, z: 6.6619596}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1313274290}
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 1378291838}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1650522512
 GameObject:
@@ -3155,7 +3214,7 @@ SceneRoots:
   - {fileID: 1251151031}
   - {fileID: 187133942}
   - {fileID: 392625593}
-  - {fileID: 1558124498}
   - {fileID: 1378291838}
   - {fileID: 490617336}
   - {fileID: 594108736}
+  - {fileID: 17178707}

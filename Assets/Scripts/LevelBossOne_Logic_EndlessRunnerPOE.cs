@@ -1,42 +1,34 @@
-using System.Buffers.Text;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class LevelBossOne_Logic_EndlessRunnerPOE : MonoBehaviour
 {
-    public float pickupSpeed = 5f;
+    [Header("References")]
+    public Transform player;
+
+    [Header("Follow Settings")]
+    public float fixedDistanceAhead = 20f;
+    public float fixedHeight = 3f;
+    public float centerX = -8f;
+
+    [Header("Floating Settings")]
     public float bobHeight = 0.2f;
     public float bobSpeed = 3f;
-    public float sideToSideAmplitude = 5f;
+
+    [Header("Side To Side Settings")]
+    public float sideToSideAmplitude = 2f;
     public float sideToSideFrequency = 1f;
-   
-    private float baseX;
-    private float baseY;
-    private Collider BossCollider;
-    private GameObject LevelOneBoss;
 
-    void Start()
-    {
-        LevelOneBoss = GetComponent<GameObject>();
-    }
-
-    // Update is called once per frame
     void Update()
     {
-        BobbingEffect();
-        MoveSideToSide();
-    }
+        if (player == null)
+        {
+            return;
+        }
 
+        float newX = centerX + Mathf.Sin(Time.time * sideToSideFrequency) * sideToSideAmplitude;
+        float newY = fixedHeight + Mathf.Sin(Time.time * bobSpeed) * bobHeight;
+        float newZ = player.position.z + fixedDistanceAhead;
 
-    private void BobbingEffect()
-    {
-        float newY = baseY + Mathf.Sin(Time.time * bobSpeed) * bobHeight;
-        transform.position = new Vector3(transform.position.x, newY, transform.position.z);
-    }
-
-    private void MoveSideToSide()
-    {
-        float newX = baseX + Mathf.Sin(Time.time * sideToSideFrequency) * sideToSideAmplitude;
-        transform.position = new Vector3(newX  , transform.position.y , transform.position.z);
+        transform.position = new Vector3(newX, newY, newZ);
     }
 }

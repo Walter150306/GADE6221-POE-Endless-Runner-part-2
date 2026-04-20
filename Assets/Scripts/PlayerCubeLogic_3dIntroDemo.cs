@@ -14,6 +14,11 @@ public class PlayerCubeLogic_3dIntroDemo : MonoBehaviour
     public float jumpForce = 5f;
     private bool isGrounded;
 
+    [Header("Boss Water Mode")]
+    public bool isInBossWaterPhase = false;
+    public float waterSurfaceY = 0.72f;
+    private bool isDiving = false;
+
     void Start()
     {
         PlayerRigidbody = GetComponent<Rigidbody>();
@@ -27,10 +32,13 @@ public class PlayerCubeLogic_3dIntroDemo : MonoBehaviour
         Vector3 movement = new Vector3(moveX, 0f, 0f) * playerSpeed * Time.deltaTime;
         PlayerRigidbody.transform.Translate(movement);
 
-        if (Keyboard.current.spaceKey.wasPressedThisFrame && isGrounded)
+        if (!isInBossWaterPhase)
         {
-            PlayerRigidbody.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
-            isGrounded = false;
+            if (Keyboard.current.spaceKey.wasPressedThisFrame && isGrounded)
+            {
+                PlayerRigidbody.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+                isGrounded = false;
+            }
         }
     }
 
@@ -40,5 +48,22 @@ public class PlayerCubeLogic_3dIntroDemo : MonoBehaviour
         {
             isGrounded = true;
         }
+    }
+
+    public void EnterBossWaterPhase()
+    {
+        isInBossWaterPhase = true;
+
+        Vector3 pos = transform.position;
+        pos.y = waterSurfaceY;
+        transform.position = pos;
+
+        PlayerRigidbody.velocity = Vector3.zero;
+    }
+
+    public void ExitBossWaterPhase()
+    {
+        isInBossWaterPhase = false;
+        isDiving = false;
     }
 }
