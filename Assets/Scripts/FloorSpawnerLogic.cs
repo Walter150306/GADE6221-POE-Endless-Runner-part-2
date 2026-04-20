@@ -13,22 +13,28 @@ public class FloorSpawnerLogic : MonoBehaviour
 
     [Header("Normal Tile")]
     public GameObject normalFloorTilePrefab;
+    public float normalTileLength = 30f;
 
-    [Header("Boss Tiles")]
+    [Header("Boss Entrance Tile")]
     public GameObject bossEntranceTilePrefab;
-    public GameObject bossMiddleTilePrefab;
-    public GameObject bossExitTilePrefab;
+    public float bossEntranceTileLength = 20f;
 
-    [Header("Floor Settings")]
+    [Header("Boss Middle Tile")]
+    public GameObject bossMiddleTilePrefab;
+    public float bossMiddleTileLength = 30f;
+
+    [Header("Boss Exit Tile")]
+    public GameObject bossExitTilePrefab;
+    public float bossExitTileLength = 20f;
+
+    [Header("Spawner Settings")]
     public int floorCount = 5;
-    public float floorLength = 30f;
     public float spawnX = -5f;
     public float spawnY = 0f;
     public float spawnStartZ = 0f;
 
     [Header("Boss Phase")]
     public TilePhase currentPhase = TilePhase.Normal;
-    public bool bossFightActive = false;
 
     private List<GameObject> floorTiles = new List<GameObject>();
 
@@ -36,10 +42,12 @@ public class FloorSpawnerLogic : MonoBehaviour
     {
         floorTiles.Clear();
 
+        float currentZ = spawnStartZ;
+
         for (int i = 0; i < floorCount; i++)
         {
-            float z = spawnStartZ - (i * floorLength);
-            SpawnTileAt(z);
+            GameObject tile = SpawnTileAt(currentZ);
+            currentZ -= GetLengthFromTileName(tile.name);
         }
     }
 
@@ -50,19 +58,20 @@ public class FloorSpawnerLogic : MonoBehaviour
         if (floorTiles.Count < floorCount)
         {
             float furthestBackZ = GetFurthestBackMovingTileZ();
-            float newZ = furthestBackZ - floorLength;
+            float nextTileLength = GetNextTileLength();
+            float newZ = furthestBackZ - nextTileLength;
             SpawnTileAt(newZ);
         }
     }
 
-    void SpawnTileAt(float z)
+    GameObject SpawnTileAt(float z)
     {
         GameObject prefabToSpawn = GetNextTilePrefab();
 
         if (prefabToSpawn == null)
         {
-            Debug.LogWarning("No floor tile prefab assigned for phase: " + currentPhase);
-            return;
+            Debug.LogWarning("No tile prefab assigned for phase: " + currentPhase);
+            return null;
         }
 
         Vector3 spawnPosition = new Vector3(spawnX, spawnY, z);
@@ -70,6 +79,7 @@ public class FloorSpawnerLogic : MonoBehaviour
         floorTiles.Add(tile);
 
         Debug.Log("Spawned: " + tile.name + " at " + tile.transform.position);
+        return tile;
     }
 
     GameObject GetNextTilePrefab()
@@ -82,7 +92,6 @@ public class FloorSpawnerLogic : MonoBehaviour
         if (currentPhase == TilePhase.BossEntrance)
         {
             currentPhase = TilePhase.BossMiddle;
-            bossFightActive = true;
             return bossEntranceTilePrefab;
         }
 
@@ -94,11 +103,57 @@ public class FloorSpawnerLogic : MonoBehaviour
         if (currentPhase == TilePhase.BossExit)
         {
             currentPhase = TilePhase.Normal;
-            bossFightActive = false;
             return bossExitTilePrefab;
         }
 
         return normalFloorTilePrefab;
+    }
+
+    float GetNextTileLength()
+    {
+        if (currentPhase == TilePhase.Normal)
+        {
+            return normalTileLength;
+        }
+
+        if (currentPhase == TilePhase.BossEntrance)
+        {
+            return bossEntranceTileLength;
+        }
+
+        if (currentPhase == TilePhase.BossMiddle)
+        {
+            return bossMiddleTileLength;
+        }
+
+        if (currentPhase == TilePhase.BossExit)
+        {
+            return bossExitTileLength;
+        }
+
+        return normalTileLength;
+    }
+
+    float GetLengthFromTileName(string tileName)
+    {
+        string lowerName = tileName.ToLower();
+
+        if (lowerName.Contains("entrance"))
+        {
+            return bossEntranceTileLength;
+        }
+
+        if (lowerName.Contains("exit"))
+        {
+            return bossExitTileLength;
+        }
+
+        if (lowerName.Contains("boss"))
+        {
+            return bossMiddleTileLength;
+        }
+
+        return normalTileLength;
     }
 
     float GetFurthestBackMovingTileZ()

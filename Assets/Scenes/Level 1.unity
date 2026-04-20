@@ -1807,16 +1807,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: '::'
   normalFloorTilePrefab: {fileID: 4169498534549526967, guid: d82ebb6763a8bc646b322c61d5df241f, type: 3}
+  normalTileLength: 30
   bossEntranceTilePrefab: {fileID: 2889325131114095920, guid: a629da9c26ebc094f8d7ab6191e551e9, type: 3}
+  bossEntranceTileLength: 35
   bossMiddleTilePrefab: {fileID: 4010336324161280029, guid: 2438a96a1d7a7de458c4735ea2f2b12b, type: 3}
+  bossMiddleTileLength: 40
   bossExitTilePrefab: {fileID: 5411457150468359109, guid: d06788fafc1f7f74f881e81ff5ba9fb0, type: 3}
+  bossExitTileLength: 35
   floorCount: 5
-  floorLength: 30
   spawnX: -6.7
   spawnY: 0
   spawnStartZ: 10
   currentPhase: 0
-  bossFightActive: 0
 --- !u!4 &717489217
 Transform:
   m_ObjectHideFlags: 0
