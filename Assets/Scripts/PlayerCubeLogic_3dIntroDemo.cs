@@ -32,7 +32,7 @@ public class PlayerCubeLogic_3dIntroDemo : MonoBehaviour
         Vector3 movement = new Vector3(moveX, 0f, 0f) * playerSpeed * Time.deltaTime;
         PlayerRigidbody.transform.Translate(movement);
 
-        if (!isInBossWaterPhase)
+        if (!isInBossWaterPhase) //Notes from Baf: Make so that this only activates when touching the boss floor
         {
             if (Keyboard.current.spaceKey.wasPressedThisFrame && isGrounded)
             {
@@ -58,7 +58,7 @@ public class PlayerCubeLogic_3dIntroDemo : MonoBehaviour
         pos.y = waterSurfaceY;
         transform.position = pos;
 
-        PlayerRigidbody.velocity = Vector3.zero;
+        PlayerRigidbody.linearVelocity = Vector3.zero;
     }
 
     public void ExitBossWaterPhase()
