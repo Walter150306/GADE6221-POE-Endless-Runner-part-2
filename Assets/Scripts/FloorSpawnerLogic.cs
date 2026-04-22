@@ -35,6 +35,11 @@ public class FloorSpawnerLogic : MonoBehaviour
 
     [Header("Boss Phase")]
     public TilePhase currentPhase = TilePhase.Normal;
+    public int bossMiddleTilesToSpawn = 3;
+
+    private int bossMiddleTilesRemaining = 0;
+    private bool bossSequenceStarted = false;
+    private bool forcingBossExit = false;
 
     private List<GameObject> floorTiles = new List<GameObject>();
 
@@ -47,7 +52,11 @@ public class FloorSpawnerLogic : MonoBehaviour
         for (int i = 0; i < floorCount; i++)
         {
             GameObject tile = SpawnTileAt(currentZ);
-            currentZ -= GetLengthFromTileName(tile.name);
+
+            if (tile != null)
+            {
+                currentZ -= GetLengthFromPrefab(tile.name);
+            }
         }
     }
 
@@ -84,6 +93,13 @@ public class FloorSpawnerLogic : MonoBehaviour
 
     GameObject GetNextTilePrefab()
     {
+        if (forcingBossExit)
+        {
+            forcingBossExit = false;
+            currentPhase = TilePhase.Normal;
+            return bossExitTilePrefab;
+        }
+
         if (currentPhase == TilePhase.Normal)
         {
             return normalFloorTilePrefab;
@@ -92,18 +108,26 @@ public class FloorSpawnerLogic : MonoBehaviour
         if (currentPhase == TilePhase.BossEntrance)
         {
             currentPhase = TilePhase.BossMiddle;
+            bossMiddleTilesRemaining = bossMiddleTilesToSpawn;
             return bossEntranceTilePrefab;
         }
 
         if (currentPhase == TilePhase.BossMiddle)
         {
-            return bossMiddleTilePrefab;
+            if (bossMiddleTilesRemaining > 0)
+            {
+                bossMiddleTilesRemaining--;
+                return bossMiddleTilePrefab;
+            }
+
+            currentPhase = TilePhase.BossExit;
+            return bossExitTilePrefab;
         }
 
         if (currentPhase == TilePhase.BossExit)
         {
             currentPhase = TilePhase.Normal;
-            return bossExitTilePrefab;
+            return normalFloorTilePrefab;
         }
 
         return normalFloorTilePrefab;
@@ -111,6 +135,11 @@ public class FloorSpawnerLogic : MonoBehaviour
 
     float GetNextTileLength()
     {
+        if (forcingBossExit)
+        {
+            return bossExitTileLength;
+        }
+
         if (currentPhase == TilePhase.Normal)
         {
             return normalTileLength;
@@ -134,7 +163,7 @@ public class FloorSpawnerLogic : MonoBehaviour
         return normalTileLength;
     }
 
-    float GetLengthFromTileName(string tileName)
+    float GetLengthFromPrefab(string tileName)
     {
         string lowerName = tileName.ToLower();
 
@@ -158,7 +187,8 @@ public class FloorSpawnerLogic : MonoBehaviour
 
     float GetFurthestBackMovingTileZ()
     {
-        float furthestBackZ = float.PositiveInfinity;
+        float furthestBackZ = spawnStartZ;
+        bool foundTile = false;
 
         foreach (GameObject tile in floorTiles)
         {
@@ -169,15 +199,14 @@ public class FloorSpawnerLogic : MonoBehaviour
 
             Transform movingTile = tile.transform.Find("MovingTile");
 
-            if (movingTile != null && movingTile.position.z < furthestBackZ)
+            if (movingTile != null)
             {
-                furthestBackZ = movingTile.position.z;
+                if (!foundTile || movingTile.position.z < furthestBackZ)
+                {
+                    furthestBackZ = movingTile.position.z;
+                    foundTile = true;
+                }
             }
-        }
-
-        if (furthestBackZ == float.PositiveInfinity)
-        {
-            return spawnStartZ;
         }
 
         return furthestBackZ;
@@ -185,11 +214,24 @@ public class FloorSpawnerLogic : MonoBehaviour
 
     public void StartBossTunnelPhase()
     {
+        if (bossSequenceStarted)
+        {
+            return;
+        }
+
         currentPhase = TilePhase.BossEntrance;
+        bossMiddleTilesRemaining = bossMiddleTilesToSpawn;
+        bossSequenceStarted = true;
+
+        Debug.Log("FloorSpawner: Boss tunnel started.");
     }
 
-    public void EndBossTunnelPhase()
+    public void ForceBossExitPhase()
     {
-        currentPhase = TilePhase.BossExit;
+        forcingBossExit = true;
+        currentPhase = TilePhase.Normal;
+        bossMiddleTilesRemaining = 0;
+
+        Debug.Log("FloorSpawner: Forcing one boss exit tile.");
     }
 }

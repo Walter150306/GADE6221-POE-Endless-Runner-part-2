@@ -2,52 +2,74 @@ using UnityEngine;
 
 public class BossSpawnerLogic_EndlessRunnerPOE : MonoBehaviour
 {
+    [Header("References")]
     public GameObject bossPrefab;
     public Transform player;
     public BossEnvironmentLogic bossEnvironment;
+    public FloorSpawnerLogic floorSpawner;
+
+    [Header("Spawn Position")]
+    public float spawnX = -8f;
+    public float riseStartY = -4f;
+    public float finalBossY = 2f;
+    public float spawnDistanceAhead = -15f;
+
+    [Header("Fight Settings")]
+    public float fightDuration = 30f;
 
     private bool bossSpawned = false;
+    private bool bossPhaseFinished = false;
+    private GameObject currentBoss;
 
-    [Header("Spawn Settings")]
-    public float spawnDistanceAhead = 20f;
-    public float spawnHeight = 3f;
-
-    void Update()
+    public void TriggerBossRise()
     {
-        if (!bossSpawned && Input.GetKeyDown(KeyCode.B))
+        Debug.Log("BossSpawner: TriggerBossRise called.");
+
+        if (bossSpawned || bossPhaseFinished)
         {
-            SpawnBoss();
+            Debug.Log("BossSpawner: Boss already active or phase already finished.");
+            return;
         }
+
+        SpawnBoss();
     }
 
     void SpawnBoss()
     {
-        if (bossPrefab == null || player == null)
+        if (bossPrefab == null)
         {
-            Debug.LogWarning("Boss prefab or player not assigned.");
+            Debug.LogError("BossSpawner: bossPrefab is not assigned.");
             return;
         }
 
-        FloorSpawnerLogic floorSpawner = FindObjectOfType<FloorSpawnerLogic>();
-
-        if (floorSpawner != null)
+        if (player == null)
         {
-            floorSpawner.StartBossTunnelPhase();
+            Debug.LogError("BossSpawner: player is not assigned.");
+            return;
         }
 
         Vector3 spawnPosition = new Vector3(
-            player.position.x,
-            spawnHeight,
+            spawnX,
+            riseStartY,
             player.position.z + spawnDistanceAhead
         );
 
-        GameObject boss = Instantiate(bossPrefab, spawnPosition, Quaternion.identity);
+        Debug.Log("BossSpawner: Spawning boss at " + spawnPosition);
 
-        LevelBossOne_Logic_EndlessRunnerPOE bossLogic = boss.GetComponent<LevelBossOne_Logic_EndlessRunnerPOE>();
+        currentBoss = Instantiate(bossPrefab, spawnPosition, Quaternion.identity);
+
+        LevelBossOne_Logic_EndlessRunnerPOE bossLogic = currentBoss.GetComponent<LevelBossOne_Logic_EndlessRunnerPOE>();
 
         if (bossLogic != null)
         {
             bossLogic.player = player;
+            bossLogic.startY = riseStartY;
+            bossLogic.finalY = finalBossY;
+            bossLogic.BeginRise();
+        }
+        else
+        {
+            Debug.LogError("BossSpawner: Spawned boss is missing LevelBossOne_Logic_EndlessRunnerPOE.");
         }
 
         if (bossEnvironment != null)
@@ -63,5 +85,39 @@ public class BossSpawnerLogic_EndlessRunnerPOE : MonoBehaviour
         }
 
         bossSpawned = true;
+        Invoke(nameof(EndBossFight), fightDuration);
+    }
+
+    void EndBossFight()
+    {
+        Debug.Log("BossSpawner: Ending boss fight.");
+
+        if (currentBoss != null)
+        {
+            Destroy(currentBoss);
+        }
+
+        if (bossEnvironment != null)
+        {
+            bossEnvironment.ExitBossPhase();
+        }
+
+        if (player != null)
+        {
+            PlayerCubeLogic_3dIntroDemo playerLogic = player.GetComponent<PlayerCubeLogic_3dIntroDemo>();
+
+            if (playerLogic != null)
+            {
+                playerLogic.ExitBossWaterPhase();
+            }
+        }
+
+        if (floorSpawner != null)
+        {
+            floorSpawner.ForceBossExitPhase();
+        }
+
+        bossSpawned = false;
+        bossPhaseFinished = true;
     }
 }

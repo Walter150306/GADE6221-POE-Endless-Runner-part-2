@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 8173947575627933004}
   - component: {fileID: 5374779390240326208}
   m_Layer: 0
-  m_Name: TempBossCylinder
+  m_Name: Boss
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

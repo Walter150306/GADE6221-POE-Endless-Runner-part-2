@@ -11,9 +11,10 @@ GameObject:
   - component: {fileID: 6547527422337432896}
   - component: {fileID: 3210660767064999167}
   - component: {fileID: 4824755513192336317}
+  - component: {fileID: 5610699390330316697}
   m_Layer: 0
   m_Name: Tunnel Roof.007
-  m_TagString: Untagged
+  m_TagString: Ground
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -91,6 +92,28 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!64 &5610699390330316697
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2535832718108754645}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 6833808056453623440, guid: da2bf62c1194b7a439433baf06e4f566, type: 3}
 --- !u!1 &4010336324161280029
 GameObject:
   m_ObjectHideFlags: 0
@@ -183,8 +206,8 @@ Transform:
   m_GameObject: {fileID: 7425835151722731571}
   serializedVersion: 2
   m_LocalRotation: {x: -1.740323e-14, y: 1, z: 0.000000037748947, w: 0.00000019470718}
-  m_LocalPosition: {x: -0, y: 0.9340935, z: 5.684342e-16}
-  m_LocalScale: {x: 26.592884, y: 1, z: 3.63309}
+  m_LocalPosition: {x: -0, y: 1.087, z: 5.684342e-16}
+  m_LocalScale: {x: 26.592884, y: 0.046387, z: 3.63309}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 7952922424732005379}
