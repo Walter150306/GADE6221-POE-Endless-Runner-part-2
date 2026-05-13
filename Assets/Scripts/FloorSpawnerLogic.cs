@@ -14,48 +14,82 @@ public class FloorSpawnerLogic : MonoBehaviour
     [Header("Normal Tile")]
     public GameObject normalFloorTilePrefab;
     public float normalTileLength = 30f;
+    public float normalTileRotationY = 0f;
+    public float normalTileXOffset = 0f;
 
     [Header("Boss Entrance Tile")]
     public GameObject bossEntranceTilePrefab;
-    public float bossEntranceTileLength = 20f;
+    public float bossEntranceTileLength = 35f;
+    public float bossEntranceTileRotationY = 0f;
+    public float bossEntranceTileXOffset = 0f;
 
     [Header("Boss Middle Tile")]
     public GameObject bossMiddleTilePrefab;
-    public float bossMiddleTileLength = 30f;
+    public float bossMiddleTileLength = 40f;
+    public float bossMiddleTileRotationY = 0f;
+    public float bossMiddleTileXOffset = 0f;
 
     [Header("Boss Exit Tile")]
     public GameObject bossExitTilePrefab;
-    public float bossExitTileLength = 20f;
+    public float bossExitTileLength = 23.15f;
+    public float bossExitTileRotationY = 180f;
+    public float bossExitTileXOffset = -1f;
 
     [Header("Spawner Settings")]
     public int floorCount = 5;
-    public float spawnX = -5f;
+    public float spawnX = -6.7f;
     public float spawnY = 0f;
-    public float spawnStartZ = 0f;
+    public float spawnStartZ = 10f;
 
     [Header("Boss Phase")]
     public TilePhase currentPhase = TilePhase.Normal;
-    public int bossMiddleTilesToSpawn = 3;
+    public int bossMiddleTilesToSpawn = 4;
 
-    private int bossMiddleTilesRemaining = 0;
     private bool bossSequenceStarted = false;
-    private bool forcingBossExit = false;
 
     private List<GameObject> floorTiles = new List<GameObject>();
+    private Queue<TileSpawnData> bossTileQueue = new Queue<TileSpawnData>();
+
+    private struct TileSpawnData
+    {
+        public GameObject prefab;
+        public float length;
+        public float rotationY;
+        public float xOffset;
+        public TilePhase phase;
+
+        public TileSpawnData(GameObject prefab, float length, float rotationY, float xOffset, TilePhase phase)
+        {
+            this.prefab = prefab;
+            this.length = length;
+            this.rotationY = rotationY;
+            this.xOffset = xOffset;
+            this.phase = phase;
+        }
+    }
 
     void Start()
     {
         floorTiles.Clear();
+        bossTileQueue.Clear();
 
         float currentZ = spawnStartZ;
 
         for (int i = 0; i < floorCount; i++)
         {
-            GameObject tile = SpawnTileAt(currentZ);
+            TileSpawnData tileData = new TileSpawnData(
+                normalFloorTilePrefab,
+                normalTileLength,
+                normalTileRotationY,
+                normalTileXOffset,
+                TilePhase.Normal
+            );
+
+            GameObject tile = SpawnTile(tileData, currentZ);
 
             if (tile != null)
             {
-                currentZ -= GetLengthFromPrefab(tile.name);
+                currentZ -= normalTileLength;
             }
         }
     }
@@ -64,131 +98,98 @@ public class FloorSpawnerLogic : MonoBehaviour
     {
         floorTiles.RemoveAll(tile => tile == null);
 
-        if (floorTiles.Count < floorCount)
+        int safetyCounter = 0;
+
+        while (floorTiles.Count < floorCount && safetyCounter < 10)
         {
-            float furthestBackZ = GetFurthestBackMovingTileZ();
-            float nextTileLength = GetNextTileLength();
-            float newZ = furthestBackZ - nextTileLength;
-            SpawnTileAt(newZ);
+            SpawnNextTile();
+            safetyCounter++;
         }
     }
 
-    GameObject SpawnTileAt(float z)
+    void SpawnNextTile()
     {
-        GameObject prefabToSpawn = GetNextTilePrefab();
+        GameObject furthestTile = GetFurthestBackTile();
 
-        if (prefabToSpawn == null)
+        float newZ = spawnStartZ;
+
+        if (furthestTile != null)
         {
-            Debug.LogWarning("No tile prefab assigned for phase: " + currentPhase);
+            Transform movingTransform = GetMovingTransform(furthestTile);
+            float previousLength = GetStoredLength(furthestTile);
+
+            newZ = movingTransform.position.z - previousLength;
+        }
+
+        TileSpawnData nextTileData = GetNextTileData();
+        SpawnTile(nextTileData, newZ);
+    }
+
+    TileSpawnData GetNextTileData()
+    {
+        if (bossTileQueue.Count > 0)
+        {
+            TileSpawnData nextBossTile = bossTileQueue.Dequeue();
+            currentPhase = nextBossTile.phase;
+            return nextBossTile;
+        }
+
+        currentPhase = TilePhase.Normal;
+
+        return new TileSpawnData(
+            normalFloorTilePrefab,
+            normalTileLength,
+            normalTileRotationY,
+            normalTileXOffset,
+            TilePhase.Normal
+        );
+    }
+
+    GameObject SpawnTile(TileSpawnData tileData, float z)
+    {
+        if (tileData.prefab == null)
+        {
+            Debug.LogWarning("FloorSpawner: Missing prefab for phase: " + tileData.phase);
             return null;
         }
 
-        Vector3 spawnPosition = new Vector3(spawnX, spawnY, z);
-        GameObject tile = Instantiate(prefabToSpawn, spawnPosition, Quaternion.identity);
+        Vector3 spawnPosition = new Vector3(spawnX + tileData.xOffset, spawnY, z);
+        Quaternion spawnRotation = Quaternion.Euler(0f, tileData.rotationY, 0f);
+
+        GameObject tile = Instantiate(tileData.prefab, spawnPosition, spawnRotation);
+
+        FloorTileLengthMarker marker = tile.GetComponent<FloorTileLengthMarker>();
+
+        if (marker == null)
+        {
+            marker = tile.AddComponent<FloorTileLengthMarker>();
+        }
+
+        marker.tileLength = tileData.length;
+        marker.tilePhase = tileData.phase;
+
         floorTiles.Add(tile);
 
-        Debug.Log("Spawned: " + tile.name + " at " + tile.transform.position);
+        Debug.Log(
+            "FloorSpawner spawned: " +
+            tile.name +
+            " | Phase: " +
+            tileData.phase +
+            " | X: " +
+            spawnPosition.x +
+            " | Z: " +
+            spawnPosition.z +
+            " | Rotation Y: " +
+            tileData.rotationY
+        );
+
         return tile;
     }
 
-    GameObject GetNextTilePrefab()
+    GameObject GetFurthestBackTile()
     {
-        if (forcingBossExit)
-        {
-            forcingBossExit = false;
-            currentPhase = TilePhase.Normal;
-            return bossExitTilePrefab;
-        }
-
-        if (currentPhase == TilePhase.Normal)
-        {
-            return normalFloorTilePrefab;
-        }
-
-        if (currentPhase == TilePhase.BossEntrance)
-        {
-            currentPhase = TilePhase.BossMiddle;
-            bossMiddleTilesRemaining = bossMiddleTilesToSpawn;
-            return bossEntranceTilePrefab;
-        }
-
-        if (currentPhase == TilePhase.BossMiddle)
-        {
-            if (bossMiddleTilesRemaining > 0)
-            {
-                bossMiddleTilesRemaining--;
-                return bossMiddleTilePrefab;
-            }
-
-            currentPhase = TilePhase.BossExit;
-            return bossExitTilePrefab;
-        }
-
-        if (currentPhase == TilePhase.BossExit)
-        {
-            currentPhase = TilePhase.Normal;
-            return normalFloorTilePrefab;
-        }
-
-        return normalFloorTilePrefab;
-    }
-
-    float GetNextTileLength()
-    {
-        if (forcingBossExit)
-        {
-            return bossExitTileLength;
-        }
-
-        if (currentPhase == TilePhase.Normal)
-        {
-            return normalTileLength;
-        }
-
-        if (currentPhase == TilePhase.BossEntrance)
-        {
-            return bossEntranceTileLength;
-        }
-
-        if (currentPhase == TilePhase.BossMiddle)
-        {
-            return bossMiddleTileLength;
-        }
-
-        if (currentPhase == TilePhase.BossExit)
-        {
-            return bossExitTileLength;
-        }
-
-        return normalTileLength;
-    }
-
-    float GetLengthFromPrefab(string tileName)
-    {
-        string lowerName = tileName.ToLower();
-
-        if (lowerName.Contains("entrance"))
-        {
-            return bossEntranceTileLength;
-        }
-
-        if (lowerName.Contains("exit"))
-        {
-            return bossExitTileLength;
-        }
-
-        if (lowerName.Contains("boss"))
-        {
-            return bossMiddleTileLength;
-        }
-
-        return normalTileLength;
-    }
-
-    float GetFurthestBackMovingTileZ()
-    {
-        float furthestBackZ = spawnStartZ;
-        bool foundTile = false;
+        GameObject furthestTile = null;
+        float furthestBackZ = 0f;
 
         foreach (GameObject tile in floorTiles)
         {
@@ -197,41 +198,102 @@ public class FloorSpawnerLogic : MonoBehaviour
                 continue;
             }
 
-            Transform movingTile = tile.transform.Find("MovingTile");
+            Transform movingTransform = GetMovingTransform(tile);
+            float tileZ = movingTransform.position.z;
 
-            if (movingTile != null)
+            if (furthestTile == null || tileZ < furthestBackZ)
             {
-                if (!foundTile || movingTile.position.z < furthestBackZ)
-                {
-                    furthestBackZ = movingTile.position.z;
-                    foundTile = true;
-                }
+                furthestBackZ = tileZ;
+                furthestTile = tile;
             }
         }
 
-        return furthestBackZ;
+        return furthestTile;
+    }
+
+    Transform GetMovingTransform(GameObject tile)
+    {
+        Transform movingTile = tile.transform.Find("MovingTile");
+
+        if (movingTile != null)
+        {
+            return movingTile;
+        }
+
+        return tile.transform;
+    }
+
+    float GetStoredLength(GameObject tile)
+    {
+        FloorTileLengthMarker marker = tile.GetComponent<FloorTileLengthMarker>();
+
+        if (marker != null)
+        {
+            return marker.tileLength;
+        }
+
+        return normalTileLength;
     }
 
     public void StartBossTunnelPhase()
     {
         if (bossSequenceStarted)
         {
+            Debug.Log("FloorSpawner: Boss sequence already started.");
             return;
         }
 
-        currentPhase = TilePhase.BossEntrance;
-        bossMiddleTilesRemaining = bossMiddleTilesToSpawn;
         bossSequenceStarted = true;
+        bossTileQueue.Clear();
 
-        Debug.Log("FloorSpawner: Boss tunnel started.");
+        bossTileQueue.Enqueue(new TileSpawnData(
+            bossEntranceTilePrefab,
+            bossEntranceTileLength,
+            bossEntranceTileRotationY,
+            bossEntranceTileXOffset,
+            TilePhase.BossEntrance
+        ));
+
+        for (int i = 0; i < bossMiddleTilesToSpawn; i++)
+        {
+            bossTileQueue.Enqueue(new TileSpawnData(
+                bossMiddleTilePrefab,
+                bossMiddleTileLength,
+                bossMiddleTileRotationY,
+                bossMiddleTileXOffset,
+                TilePhase.BossMiddle
+            ));
+        }
+
+        bossTileQueue.Enqueue(new TileSpawnData(
+            bossExitTilePrefab,
+            bossExitTileLength,
+            bossExitTileRotationY,
+            bossExitTileXOffset,
+            TilePhase.BossExit
+        ));
+
+        Debug.Log("FloorSpawner: Boss tunnel sequence queued.");
     }
 
     public void ForceBossExitPhase()
     {
-        forcingBossExit = true;
-        currentPhase = TilePhase.Normal;
-        bossMiddleTilesRemaining = 0;
+        bossTileQueue.Clear();
 
-        Debug.Log("FloorSpawner: Forcing one boss exit tile.");
+        bossTileQueue.Enqueue(new TileSpawnData(
+            bossExitTilePrefab,
+            bossExitTileLength,
+            bossExitTileRotationY,
+            bossExitTileXOffset,
+            TilePhase.BossExit
+        ));
+
+        Debug.Log("FloorSpawner: Boss exit tile forced.");
     }
+}
+
+public class FloorTileLengthMarker : MonoBehaviour
+{
+    public float tileLength;
+    public FloorSpawnerLogic.TilePhase tilePhase;
 }

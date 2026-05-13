@@ -1811,12 +1811,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: '::'
   normalFloorTilePrefab: {fileID: 4169498534549526967, guid: d82ebb6763a8bc646b322c61d5df241f, type: 3}
   normalTileLength: 30
+  normalTileRotationY: 0
+  normalTileXOffset: 0
   bossEntranceTilePrefab: {fileID: 2889325131114095920, guid: a629da9c26ebc094f8d7ab6191e551e9, type: 3}
   bossEntranceTileLength: 35
+  bossEntranceTileRotationY: 0
+  bossEntranceTileXOffset: 0
   bossMiddleTilePrefab: {fileID: 4010336324161280029, guid: 2438a96a1d7a7de458c4735ea2f2b12b, type: 3}
   bossMiddleTileLength: 40
+  bossMiddleTileRotationY: 0
+  bossMiddleTileXOffset: 0
   bossExitTilePrefab: {fileID: 5411457150468359109, guid: d06788fafc1f7f74f881e81ff5ba9fb0, type: 3}
   bossExitTileLength: 23.15
+  bossExitTileRotationY: 180
+  bossExitTileXOffset: -1
   floorCount: 5
   spawnX: -6.7
   spawnY: 0
@@ -2749,7 +2757,6 @@ MonoBehaviour:
   riseStartY: -4
   finalBossY: 2
   spawnDistanceAhead: -20
-  fightDuration: 30
 --- !u!4 &1378291838
 Transform:
   m_ObjectHideFlags: 0

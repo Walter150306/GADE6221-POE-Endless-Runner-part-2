@@ -155,7 +155,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1028466949032096269}
-  - component: {fileID: 2683296540997172517}
   m_Layer: 0
   m_Name: Water Tunnel Entrance (Boss)
   m_TagString: Untagged
@@ -179,19 +178,6 @@ Transform:
   - {fileID: 8671110390872267200}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2683296540997172517
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2889325131114095920}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9ccd1740dcfe77447850a7ea9b5cd862, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::BossEntranceTileLogic
-  triggerDistance: 25
 --- !u!1 &4722334313913449072
 GameObject:
   m_ObjectHideFlags: 0
@@ -202,6 +188,8 @@ GameObject:
   m_Component:
   - component: {fileID: 8671110390872267200}
   - component: {fileID: 2764137388856186208}
+  - component: {fileID: 362148043575652787}
+  - component: {fileID: 7171072825251186569}
   m_Layer: 0
   m_Name: MovingTile
   m_TagString: Untagged
@@ -239,6 +227,39 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::IceFloorLogic
   iceFloorSpeed: 5
   deleteZ: 66
+--- !u!114 &362148043575652787
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4722334313913449072}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9ccd1740dcfe77447850a7ea9b5cd862, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BossEntranceTileLogic
+--- !u!65 &7171072825251186569
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4722334313913449072}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 14.309294, y: 8.237252, z: 1.2176285}
+  m_Center: {x: -0.031271935, y: 4.0128903, z: 19.176403}
 --- !u!1 &5930030379828497189
 GameObject:
   m_ObjectHideFlags: 0

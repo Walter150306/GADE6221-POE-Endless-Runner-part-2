@@ -12,10 +12,7 @@ public class BossSpawnerLogic_EndlessRunnerPOE : MonoBehaviour
     public float spawnX = -8f;
     public float riseStartY = -4f;
     public float finalBossY = 2f;
-    public float spawnDistanceAhead = -15f;
-
-    [Header("Fight Settings")]
-    public float fightDuration = 30f;
+    public float spawnDistanceAhead = -20f;
 
     private bool bossSpawned = false;
     private bool bossPhaseFinished = false;
@@ -25,9 +22,15 @@ public class BossSpawnerLogic_EndlessRunnerPOE : MonoBehaviour
     {
         Debug.Log("BossSpawner: TriggerBossRise called.");
 
-        if (bossSpawned || bossPhaseFinished)
+        if (bossSpawned)
         {
-            Debug.Log("BossSpawner: Boss already active or phase already finished.");
+            Debug.Log("BossSpawner: Boss already spawned.");
+            return;
+        }
+
+        if (bossPhaseFinished)
+        {
+            Debug.Log("BossSpawner: Boss phase already finished.");
             return;
         }
 
@@ -54,11 +57,10 @@ public class BossSpawnerLogic_EndlessRunnerPOE : MonoBehaviour
             player.position.z + spawnDistanceAhead
         );
 
-        Debug.Log("BossSpawner: Spawning boss at " + spawnPosition);
-
         currentBoss = Instantiate(bossPrefab, spawnPosition, Quaternion.identity);
 
-        LevelBossOne_Logic_EndlessRunnerPOE bossLogic = currentBoss.GetComponent<LevelBossOne_Logic_EndlessRunnerPOE>();
+        LevelBossOne_Logic_EndlessRunnerPOE bossLogic =
+            currentBoss.GetComponent<LevelBossOne_Logic_EndlessRunnerPOE>();
 
         if (bossLogic != null)
         {
@@ -77,7 +79,8 @@ public class BossSpawnerLogic_EndlessRunnerPOE : MonoBehaviour
             bossEnvironment.EnterBossPhase();
         }
 
-        PlayerCubeLogic_3dIntroDemo playerLogic = player.GetComponent<PlayerCubeLogic_3dIntroDemo>();
+        PlayerCubeLogic_3dIntroDemo playerLogic =
+            player.GetComponent<PlayerCubeLogic_3dIntroDemo>();
 
         if (playerLogic != null)
         {
@@ -85,16 +88,24 @@ public class BossSpawnerLogic_EndlessRunnerPOE : MonoBehaviour
         }
 
         bossSpawned = true;
-        Invoke(nameof(EndBossFight), fightDuration);
+
+        Debug.Log("BossSpawner: Boss started. Water mode ON.");
     }
 
-    void EndBossFight()
+    public void EndBossFight()
     {
-        Debug.Log("BossSpawner: Ending boss fight.");
+        if (bossPhaseFinished)
+        {
+            Debug.Log("BossSpawner: Boss fight already finished.");
+            return;
+        }
+
+        Debug.Log("BossSpawner: Ending boss fight. Water mode OFF.");
 
         if (currentBoss != null)
         {
             Destroy(currentBoss);
+            currentBoss = null;
         }
 
         if (bossEnvironment != null)
@@ -104,17 +115,13 @@ public class BossSpawnerLogic_EndlessRunnerPOE : MonoBehaviour
 
         if (player != null)
         {
-            PlayerCubeLogic_3dIntroDemo playerLogic = player.GetComponent<PlayerCubeLogic_3dIntroDemo>();
+            PlayerCubeLogic_3dIntroDemo playerLogic =
+                player.GetComponent<PlayerCubeLogic_3dIntroDemo>();
 
             if (playerLogic != null)
             {
                 playerLogic.ExitBossWaterPhase();
             }
-        }
-
-        if (floorSpawner != null)
-        {
-            floorSpawner.ForceBossExitPhase();
         }
 
         bossSpawned = false;
