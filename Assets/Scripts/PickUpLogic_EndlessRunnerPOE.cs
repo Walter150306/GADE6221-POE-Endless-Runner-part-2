@@ -4,6 +4,16 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody))]
 public class PickUpLogic_EndlessRunnerPOE : MonoBehaviour
 {
+    public enum PickupType
+    {
+        Shield,
+        DoublePoints,
+        Invulnerability
+    }
+
+    [Header("Pickup Type")]
+    public PickupType pickupType = PickupType.Shield;
+
     [Header("Pickup Settings")]
     public float pickupSpeed = 5f;
 
@@ -51,11 +61,7 @@ public class PickUpLogic_EndlessRunnerPOE : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            if (GameManagerLogic_EndlessRunner.instance != null)
-            {
-                GameManagerLogic_EndlessRunner.instance.ActivateShield();
-            }
-
+            ActivatePickup();
             Destroy(gameObject);
             return;
         }
@@ -63,6 +69,29 @@ public class PickUpLogic_EndlessRunnerPOE : MonoBehaviour
         if (other.CompareTag("Deleter"))
         {
             Destroy(gameObject);
+        }
+    }
+
+    void ActivatePickup()
+    {
+        if (GameManagerLogic_EndlessRunner.instance == null)
+        {
+            return;
+        }
+
+        switch (pickupType)
+        {
+            case PickupType.Shield:
+                GameManagerLogic_EndlessRunner.instance.ActivateShield();
+                break;
+
+            case PickupType.DoublePoints:
+                GameManagerLogic_EndlessRunner.instance.ActivateDoublePoints();
+                break;
+
+            case PickupType.Invulnerability:
+                GameManagerLogic_EndlessRunner.instance.ActivateInvulnerability();
+                break;
         }
     }
 }

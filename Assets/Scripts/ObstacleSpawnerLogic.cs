@@ -1,138 +1,197 @@
-using System;
-using System.Threading;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class ObstacleSpawnerLogic : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    public Vector3 spawnPosition;
-    [Header("Spawner Settings")] // various settings for the spawner (
+    [Header("Obstacle Prefabs")]
     public GameObject barrelPrefab;
     public GameObject capsuleObstacle;
     public GameObject cylinderObstacle;
-    public Transform player;
-    public float spawnInterval = 2f;
-    public float spawnDistance = 20f;
-    private float timeCounter = 0;
 
-    [Header("Difficulty Settings")]
-    public float minInterval = 0.5f;
-    public float difficultyRampSpeed = 0.1f;
-    private float timer;
+    [Header("References")]
+    public Transform player;
+    public BossSpawnerLogic_EndlessRunnerPOE bossSpawner;
+
+    [Header("Spawn Timing")]
+    public float spawnInterval = 2f;
+    public float minSpawnInterval = 0.75f;
+    public float difficultyRampEverySeconds = 10f;
+    public float intervalDecreaseAmount = 0.25f;
+
+    [Header("Spawn Position")]
+    public float spawnY = 0.72f;
+    public float spawnZ = -8f;
+
+    [Header("Lane Positions - Player View")]
+    [FormerlySerializedAs("farLeftLaneX")]
+    public float farRightViewLaneX = -11f;
+
+    [FormerlySerializedAs("leftLaneX")]
+    public float rightViewLaneX = -8.7f;
+
+    [FormerlySerializedAs("middleLaneX")]
+    public float middleViewLaneX = -6.7f;
+
+    [FormerlySerializedAs("rightLaneX")]
+    public float leftViewLaneX = -4.8f;
+
+    [FormerlySerializedAs("farRightLaneX")]
+    public float farLeftViewLaneX = -2f;
+
+    [Header("Spawn Fairness")]
+    public int maxSameLaneRepeats = 1;
+
+    [Header("Boss Phase")]
+    public bool stopObstaclesDuringBoss = true;
+
+    private float spawnTimer = 0f;
+    private float difficultyTimer = 0f;
+
+    private int lastLaneIndex = -1;
+    private int sameLaneRepeatCount = 0;
+
     void Start()
     {
-
+        if (bossSpawner == null)
+        {
+            bossSpawner = Object.FindFirstObjectByType<BossSpawnerLogic_EndlessRunnerPOE>();
+        }
     }
 
-    // Update is called once per frame
     void Update()
     {
-        timer += Time.deltaTime;
-
-        if (timer >= spawnInterval)
+        if (stopObstaclesDuringBoss && bossSpawner != null && bossSpawner.BossPhaseInProgress)
         {
-            System.Random randObstacle = new System.Random();
-            int choice = randObstacle.Next(0, 3);
-
-            if (choice == 0)
-            {
-                spawnBarrel();
-            }
-            else if (choice == 1)
-            {
-                SpawnCapsule();
-            }
-            else
-            {
-                spawnCylinder();
-            }
-
-            timer = 0f;
+            return;
         }
+
+        HandleDifficultyRamp();
+        HandleObstacleSpawning();
     }
 
-    void spawnBarrel()
+    void HandleDifficultyRamp()
     {
-        timeCounter += Time.deltaTime;
-        // Calculate spawn position in front of the player
-        System.Random rand = new System.Random();
-        int randomPosition = rand.Next(0, 3); // Randomly select one of the three positions
-                                              
-        Vector3 spawnPosition = Vector3.zero;
+        difficultyTimer += Time.deltaTime;
 
-        if (randomPosition == 0)
+        if (difficultyTimer >= difficultyRampEverySeconds)
         {
-            spawnPosition = new Vector3(-7.12f, 0.72f, spawnDistance); // Left lane
-        }
-        else if (randomPosition == 1)
-        {
-            spawnPosition = new Vector3(-8.12f, 0.72f, spawnDistance); // Middle lane
-        }
-        else if (randomPosition == 2)
-        {
-            spawnPosition = new Vector3(-6.12f, 0.72f, spawnDistance); // Right lane
-        }
-        //spawnPosition.y = 0.5f; // Adjust height if necessary
-        // Instantiate the barrel obstacle
-        GameObject barrel = Instantiate(barrelPrefab, spawnPosition, Quaternion.identity);
-        barrel.GetComponent<BarrelLogic>().player = player;
+            spawnInterval -= intervalDecreaseAmount;
+            spawnInterval = Mathf.Max(spawnInterval, minSpawnInterval);
 
+            difficultyTimer = 0f;
+
+            Debug.Log("ObstacleSpawner: New spawn interval = " + spawnInterval);
+        }
     }
-    void SpawnCapsule()
+
+    void HandleObstacleSpawning()
     {
-        timeCounter += Time.deltaTime;
-        // Calculate spawn position in front of the player
-        System.Random rand = new System.Random();
-        int randomPosition = rand.Next(0, 3); // Randomly select one of the three positions
-                                              // ✅ Declared outside so Instantiate can see it
-        Vector3 spawnPosition = Vector3.zero;
+        spawnTimer += Time.deltaTime;
 
-        if (randomPosition == 0)
+        if (spawnTimer >= spawnInterval)
         {
-            spawnPosition = new Vector3(-7.12f, 0.72f, spawnDistance); // Left lane
+            SpawnRandomObstacle();
+            spawnTimer = 0f;
         }
-        else if (randomPosition == 1)
-        {
-            spawnPosition = new Vector3(-8.12f, 0.72f, spawnDistance); // Middle lane
-        }
-        else if (randomPosition == 2)
-        {
-            spawnPosition = new Vector3(-6.12f, 0.72f, spawnDistance); // Right lane
-        }
-        //spawnPosition.y = 0.5f; // Adjust height if necessary
-        // Instantiate the barrel obstacle
-        GameObject capsule = Instantiate(capsuleObstacle, spawnPosition, Quaternion.identity);
-        capsule.GetComponent<BarrelLogic>().player = player;
     }
 
-    void spawnCylinder()
+    void SpawnRandomObstacle()
     {
-        timeCounter += Time.deltaTime;
-        // Calculate spawn position in front of the player
-        System.Random rand = new System.Random();
-        int randomPosition = rand.Next(0, 3); // Randomly select one of the three positions
-                                              // ✅ Declared outside so Instantiate can see it
-        Vector3 spawnPosition = Vector3.zero;
+        GameObject prefabToSpawn = GetRandomObstaclePrefab();
 
-        if (randomPosition == 0)
+        if (prefabToSpawn == null)
         {
-            spawnPosition = new Vector3(-7.12f, 0.72f, spawnDistance); // Left lane
+            Debug.LogWarning("ObstacleSpawner: Missing obstacle prefab.");
+            return;
         }
-        else if (randomPosition == 1)
+
+        int laneIndex = GetFairRandomLaneIndex();
+        float spawnX = GetLaneX(laneIndex);
+
+        Vector3 spawnPosition = new Vector3(spawnX, spawnY, spawnZ);
+
+        GameObject obstacle = Instantiate(prefabToSpawn, spawnPosition, Quaternion.identity);
+
+        BarrelLogic barrelLogic = obstacle.GetComponent<BarrelLogic>();
+
+        if (barrelLogic != null)
         {
-            spawnPosition = new Vector3(-8.12f, 0.72f, spawnDistance); // Middle lane
+            barrelLogic.player = player;
         }
-        else if (randomPosition == 2)
-        {
-            spawnPosition = new Vector3(-6.12f, 0.72f, spawnDistance); // Right lane
-        }
-        //spawnPosition.y = 0.5f; // Adjust height if necessary
-        // Instantiate the barrel obstacle
-        GameObject cylinder = Instantiate(cylinderObstacle, spawnPosition, Quaternion.identity);
-        cylinder.GetComponent<BarrelLogic>().player = player;
+
+        Debug.Log("ObstacleSpawner: Spawned " + obstacle.name + " in lane " + laneIndex + " at X " + spawnX);
     }
 
+    GameObject GetRandomObstaclePrefab()
+    {
+        int choice = Random.Range(0, 3);
 
+        if (choice == 0)
+        {
+            return barrelPrefab;
+        }
 
+        if (choice == 1)
+        {
+            return capsuleObstacle;
+        }
+
+        return cylinderObstacle;
+    }
+
+    int GetFairRandomLaneIndex()
+    {
+        int laneIndex = Random.Range(0, 5);
+
+        if (laneIndex == lastLaneIndex)
+        {
+            sameLaneRepeatCount++;
+        }
+        else
+        {
+            sameLaneRepeatCount = 0;
+        }
+
+        if (sameLaneRepeatCount > maxSameLaneRepeats)
+        {
+            int newLaneIndex = laneIndex;
+
+            while (newLaneIndex == lastLaneIndex)
+            {
+                newLaneIndex = Random.Range(0, 5);
+            }
+
+            laneIndex = newLaneIndex;
+            sameLaneRepeatCount = 0;
+        }
+
+        lastLaneIndex = laneIndex;
+
+        return laneIndex;
+    }
+
+    float GetLaneX(int laneIndex)
+    {
+        if (laneIndex == 0)
+        {
+            return farRightViewLaneX;
+        }
+
+        if (laneIndex == 1)
+        {
+            return rightViewLaneX;
+        }
+
+        if (laneIndex == 2)
+        {
+            return middleViewLaneX;
+        }
+
+        if (laneIndex == 3)
+        {
+            return leftViewLaneX;
+        }
+
+        return farLeftViewLaneX;
+    }
 }
-

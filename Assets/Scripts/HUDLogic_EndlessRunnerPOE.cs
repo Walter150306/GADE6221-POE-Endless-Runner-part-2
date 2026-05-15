@@ -8,6 +8,9 @@ public class HUDLogic_EndlessRunnerPOE : MonoBehaviour
     public TextMeshProUGUI livesText;
     public TextMeshProUGUI timerText;
     public TextMeshProUGUI shieldText;
+    public TextMeshProUGUI bossStatusText;
+    public TextMeshProUGUI doublePointsText;
+    public TextMeshProUGUI invulnerabilityText;
 
     [Header("Game Data")]
     public int score = 0;
@@ -18,6 +21,9 @@ public class HUDLogic_EndlessRunnerPOE : MonoBehaviour
         UpdateLives(lives);
         UpdateScore();
         UpdateShield(false);
+        UpdateBossStatus("Boss: Waiting");
+        UpdateDoublePoints(false, 0f);
+        UpdateInvulnerability(false, 0f);
     }
 
     void Update()
@@ -33,27 +39,69 @@ public class HUDLogic_EndlessRunnerPOE : MonoBehaviour
 
     void UpdateScore()
     {
-        scoreText.text = "Score: " + score;
+        if (scoreText != null)
+        {
+            scoreText.text = "Score: " + score;
+        }
     }
 
     public void UpdateLives(int currentLives)
     {
         lives = currentLives;
-        livesText.text = "Lives: " + currentLives;
+
+        if (livesText != null)
+        {
+            livesText.text = "Lives: " + currentLives;
+        }
     }
 
     public void UpdateShield(bool shieldActive)
     {
         if (shieldText != null)
         {
-            if (shieldActive)
-            {
-                shieldText.text = "Shield: ON";
-            }
-            else
-            {
-                shieldText.text = "Shield: OFF";
-            }
+            shieldText.text = shieldActive ? "Shield: ON" : "Shield: OFF";
+        }
+    }
+
+    public void UpdateBossStatus(string status)
+    {
+        if (bossStatusText != null)
+        {
+            bossStatusText.text = status;
+        }
+    }
+
+    public void UpdateDoublePoints(bool active, float timeRemaining)
+    {
+        if (doublePointsText == null)
+        {
+            return;
+        }
+
+        if (active)
+        {
+            doublePointsText.text = "Double Points: " + timeRemaining.ToString("F1") + "s";
+        }
+        else
+        {
+            doublePointsText.text = "Double Points: OFF";
+        }
+    }
+
+    public void UpdateInvulnerability(bool active, float timeRemaining)
+    {
+        if (invulnerabilityText == null)
+        {
+            return;
+        }
+
+        if (active)
+        {
+            invulnerabilityText.text = "Invulnerable: " + timeRemaining.ToString("F1") + "s";
+        }
+        else
+        {
+            invulnerabilityText.text = "Invulnerable: OFF";
         }
     }
 
@@ -64,6 +112,9 @@ public class HUDLogic_EndlessRunnerPOE : MonoBehaviour
 
     void TimerProgress()
     {
-        timerText.text = "Time: " + Time.timeSinceLevelLoad.ToString("F2") + "s";
+        if (timerText != null)
+        {
+            timerText.text = "Time: " + Time.timeSinceLevelLoad.ToString("F2") + "s";
+        }
     }
 }
