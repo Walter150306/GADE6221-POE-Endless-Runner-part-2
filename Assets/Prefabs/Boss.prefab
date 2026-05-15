@@ -128,10 +128,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LevelBossOne_Logic_EndlessRunnerPOE
   player: {fileID: 0}
-  fixedDistanceAhead: -20
-  fixedHeight: 3
+  hornSpawnPoint: {fileID: 0}
+  hornProjectilePrefab: {fileID: 0}
+  lockedZ: 0
   centerX: -8
+  startY: -4
+  finalY: 2
+  riseSpeed: 4
   bobHeight: 0.2
   bobSpeed: 3
   sideToSideAmplitude: 5
   sideToSideFrequency: 1
+  shootInterval: 0.5

@@ -7,6 +7,7 @@ public class BossSpawnerLogic_EndlessRunnerPOE : MonoBehaviour
     public Transform player;
     public BossEnvironmentLogic bossEnvironment;
     public FloorSpawnerLogic floorSpawner;
+    public HUDLogic_EndlessRunnerPOE hudLogic;
 
     [Header("Spawn Position")]
     public float spawnX = -8f;
@@ -14,21 +15,31 @@ public class BossSpawnerLogic_EndlessRunnerPOE : MonoBehaviour
     public float finalBossY = 2f;
     public float spawnDistanceAhead = -20f;
 
-    private bool bossSpawned = false;
-    private bool bossPhaseFinished = false;
+    public bool BossPhaseInProgress { get; private set; }
+    public bool BossSpawned { get; private set; }
+    public bool BossPhaseFinished { get; private set; }
+
     private GameObject currentBoss;
+
+    void Start()
+    {
+        if (hudLogic == null)
+        {
+            hudLogic = Object.FindFirstObjectByType<HUDLogic_EndlessRunnerPOE>();
+        }
+    }
 
     public void TriggerBossRise()
     {
         Debug.Log("BossSpawner: TriggerBossRise called.");
 
-        if (bossSpawned)
+        if (BossSpawned)
         {
             Debug.Log("BossSpawner: Boss already spawned.");
             return;
         }
 
-        if (bossPhaseFinished)
+        if (BossPhaseFinished)
         {
             Debug.Log("BossSpawner: Boss phase already finished.");
             return;
@@ -87,14 +98,20 @@ public class BossSpawnerLogic_EndlessRunnerPOE : MonoBehaviour
             playerLogic.EnterBossWaterPhase();
         }
 
-        bossSpawned = true;
+        BossSpawned = true;
+        BossPhaseInProgress = true;
+
+        if (hudLogic != null)
+        {
+            hudLogic.UpdateBossStatus("Boss: Active");
+        }
 
         Debug.Log("BossSpawner: Boss started. Water mode ON.");
     }
 
     public void EndBossFight()
     {
-        if (bossPhaseFinished)
+        if (BossPhaseFinished)
         {
             Debug.Log("BossSpawner: Boss fight already finished.");
             return;
@@ -124,7 +141,13 @@ public class BossSpawnerLogic_EndlessRunnerPOE : MonoBehaviour
             }
         }
 
-        bossSpawned = false;
-        bossPhaseFinished = true;
+        BossSpawned = false;
+        BossPhaseInProgress = false;
+        BossPhaseFinished = true;
+
+        if (hudLogic != null)
+        {
+            hudLogic.UpdateBossStatus("Boss: Complete");
+        }
     }
 }
