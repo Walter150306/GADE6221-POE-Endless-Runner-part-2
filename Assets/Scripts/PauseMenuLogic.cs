@@ -1,13 +1,15 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.InputSystem;
 
 public class PauseMenuLogic : MonoBehaviour
 {
     [Header("Pause UI")]
     public GameObject pauseContainer;
 
-    [Header("Optional")]
+    [Header("Optional Blockers")]
     public GameObject gameOverPanel;
+    public GameObject levelCompletePanel;
 
     private bool isPaused = false;
 
@@ -29,7 +31,24 @@ public class PauseMenuLogic : MonoBehaviour
             return;
         }
 
+        if (levelCompletePanel != null && levelCompletePanel.activeSelf)
+        {
+            return;
+        }
+
+        bool escapePressed = false;
+
+        if (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame)
+        {
+            escapePressed = true;
+        }
+
         if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            escapePressed = true;
+        }
+
+        if (escapePressed)
         {
             TogglePause();
         }
@@ -56,6 +75,8 @@ public class PauseMenuLogic : MonoBehaviour
 
         Time.timeScale = 0f;
         isPaused = true;
+
+        Debug.Log("Game paused.");
     }
 
     public void ResumeGame()
@@ -67,6 +88,8 @@ public class PauseMenuLogic : MonoBehaviour
 
         Time.timeScale = 1f;
         isPaused = false;
+
+        Debug.Log("Game resumed.");
     }
 
     public void RestartLevel()
