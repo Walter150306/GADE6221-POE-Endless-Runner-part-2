@@ -774,7 +774,7 @@ GameObject:
   - component: {fileID: 110779109}
   - component: {fileID: 110779114}
   m_Layer: 0
-  m_Name: Base player cube
+  m_Name: PlayerPenguin
   m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
