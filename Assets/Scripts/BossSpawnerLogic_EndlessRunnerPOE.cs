@@ -9,6 +9,9 @@ public class BossSpawnerLogic_EndlessRunnerPOE : MonoBehaviour
     public FloorSpawnerLogic floorSpawner;
     public HUDLogic_EndlessRunnerPOE hudLogic;
 
+    [Header("Event Settings")]
+    public int bossNumber = 1;
+
     [Header("Spawn Position")]
     public float spawnX = -8f;
     public float riseStartY = -4f;
@@ -114,6 +117,11 @@ public class BossSpawnerLogic_EndlessRunnerPOE : MonoBehaviour
         BossSpawned = true;
         BossPhaseInProgress = true;
 
+        if (GameEventManager.Instance != null)
+        {
+            GameEventManager.Instance.BossSpawned(bossNumber);
+        }
+
         if (hudLogic != null)
         {
             hudLogic.UpdateBossStatus("Boss: Active");
@@ -157,6 +165,11 @@ public class BossSpawnerLogic_EndlessRunnerPOE : MonoBehaviour
         BossSpawned = false;
         BossPhaseInProgress = false;
         BossPhaseFinished = true;
+
+        if (GameEventManager.Instance != null)
+        {
+            GameEventManager.Instance.BossBeaten(bossNumber);
+        }
 
         if (hudLogic != null)
         {

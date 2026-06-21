@@ -80,7 +80,10 @@ public class LevelCompleteLogic : MonoBehaviour
     void CompleteLevel()
     {
         completedLevel = true;
-
+        if (GameEventManager.Instance != null)
+        {
+            GameEventManager.Instance.LevelBeaten();
+        }
         if (playerLogic != null)
         {
             playerLogic.enabled = false;
