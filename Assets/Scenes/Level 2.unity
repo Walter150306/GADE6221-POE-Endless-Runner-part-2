@@ -5333,7 +5333,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ObstacleSpawnerLogic
   barrelPrefab: {fileID: 6250346216494224067, guid: f2933e211fa17e2408b3cf4707d88882, type: 3}
-  capsuleObstacle: {fileID: 5775154345307282134, guid: 3b5eba131cc2f8a4cbf397cfe888ae2b, type: 3}
+  capsuleObstacle: {fileID: 5775154345307282134, guid: 571527c71b23c3e49a95097ee9d16f0b, type: 3}
   cylinderObstacle: {fileID: 6386405761325251462, guid: 6dc0af16d94375442afa5a76d3a4d8d5, type: 3}
   player: {fileID: 110779113}
   bossSpawner: {fileID: 1378291837}

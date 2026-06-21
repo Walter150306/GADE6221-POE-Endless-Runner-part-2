@@ -83,14 +83,32 @@ public class PickUpLogic_EndlessRunnerPOE : MonoBehaviour
         {
             case PickupType.Shield:
                 GameManagerLogic_EndlessRunner.instance.ActivateShield();
+
+                if (GameEventManager.Instance != null)
+                {
+                    GameEventManager.Instance.ShieldPickupActivated();
+                }
+
                 break;
 
             case PickupType.DoublePoints:
                 GameManagerLogic_EndlessRunner.instance.ActivateDoublePoints();
+
+                if (GameEventManager.Instance != null)
+                {
+                    GameEventManager.Instance.DoublePointsPickupActivated();
+                }
+
                 break;
 
             case PickupType.Invulnerability:
                 GameManagerLogic_EndlessRunner.instance.ActivateInvulnerability();
+
+                if (GameEventManager.Instance != null)
+                {
+                    GameEventManager.Instance.InvulnerabilityPickupActivated();
+                }
+
                 break;
         }
     }

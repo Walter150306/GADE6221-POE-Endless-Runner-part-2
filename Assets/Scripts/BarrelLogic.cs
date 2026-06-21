@@ -35,6 +35,11 @@ public class BarrelLogic : MonoBehaviour
             {
                 GameManagerLogic_EndlessRunner.instance.AddScore(1);
             }
+
+            if (GameEventManager.Instance != null)
+            {
+                GameEventManager.Instance.ObstaclePassed();
+            }
         }
     }
 
