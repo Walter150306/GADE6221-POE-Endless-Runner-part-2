@@ -8,6 +8,10 @@ public class LevelCompleteLogic : MonoBehaviour
     public float stopSpawningTime = 110f;
     public float levelCompleteTime = 120f;
 
+    [Header("Level Looping")]
+    public string currentLevelDisplayName = "Level 1";
+    public string nextSceneName = "Level 2";
+
     [Header("References")]
     public ObstacleSpawnerLogic obstacleSpawner;
     public PickupSpawnerLogic pickupSpawner;
@@ -91,7 +95,7 @@ public class LevelCompleteLogic : MonoBehaviour
 
         if (levelCompleteText != null)
         {
-            levelCompleteText.text = "Level Completed!";
+            levelCompleteText.text = currentLevelDisplayName + " Completed!";
         }
 
         if (finalScoreText != null && hudLogic != null)
@@ -106,7 +110,19 @@ public class LevelCompleteLogic : MonoBehaviour
 
         Time.timeScale = 0f;
 
-        Debug.Log("LevelCompleteLogic: Level 1 complete.");
+        Debug.Log("LevelCompleteLogic: " + currentLevelDisplayName + " complete.");
+    }
+
+    public void LoadNextLevel()
+    {
+        if (string.IsNullOrWhiteSpace(nextSceneName))
+        {
+            Debug.LogError("LevelCompleteLogic: Next Scene Name is empty.");
+            return;
+        }
+
+        Time.timeScale = 1f;
+        SceneManager.LoadScene(nextSceneName);
     }
 
     public void RestartLevel()

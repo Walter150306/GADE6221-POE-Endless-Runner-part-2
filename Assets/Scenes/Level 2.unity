@@ -269,7 +269,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Restart
+  m_text: Continue
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 125cb55b44b24c4393181402bc6200e6, type: 2}
   m_sharedMaterial: {fileID: 2100000, guid: 125cb55b44b24c4393181402bc6200e6, type: 2}
@@ -947,6 +947,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LevelCompleteLogic
   stopSpawningTime: 110
   levelCompleteTime: 120
+  currentLevelDisplayName: Level 2
+  nextSceneName: Level 1
   obstacleSpawner: {fileID: 1840853257}
   pickupSpawner: {fileID: 1558124497}
   playerLogic: {fileID: 110779114}
@@ -983,7 +985,7 @@ GameObject:
   - component: {fileID: 144386334}
   - component: {fileID: 144386333}
   m_Layer: 5
-  m_Name: RestartButton
+  m_Name: Next Level
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1055,7 +1057,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 119655708}
         m_TargetAssemblyTypeName: LevelCompleteLogic, Assembly-CSharp
-        m_MethodName: RestartLevel
+        m_MethodName: LoadNextLevel
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -2749,19 +2751,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 523814d75e8849f4f8c9b8e25a40449c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  normalFloorTilePrefab: {fileID: 4169498534549526967, guid: d82ebb6763a8bc646b322c61d5df241f, type: 3}
+  normalFloorTilePrefab: {fileID: 4169498534549526967, guid: fbd77564abca6a146ac78e6251aeda14, type: 3}
   normalTileLength: 30
   normalTileRotationY: 0
   normalTileXOffset: 0
-  bossEntranceTilePrefab: {fileID: 2889325131114095920, guid: a629da9c26ebc094f8d7ab6191e551e9, type: 3}
+  bossEntranceTilePrefab: {fileID: 2889325131114095920, guid: 172a4f3bbb9802f4bbef65544904f7d9, type: 3}
   bossEntranceTileLength: 35
   bossEntranceTileRotationY: 0
   bossEntranceTileXOffset: 0
-  bossMiddleTilePrefab: {fileID: 4010336324161280029, guid: 2438a96a1d7a7de458c4735ea2f2b12b, type: 3}
+  bossMiddleTilePrefab: {fileID: 4010336324161280029, guid: 26b90b9278db28b4d8e9a5775d4e0d69, type: 3}
   bossMiddleTileLength: 40
   bossMiddleTileRotationY: 0
   bossMiddleTileXOffset: 0
-  bossExitTilePrefab: {fileID: 5411457150468359109, guid: d06788fafc1f7f74f881e81ff5ba9fb0, type: 3}
+  bossExitTilePrefab: {fileID: 5411457150468359109, guid: ce9c0d49277c3a5489453b6c4beb67ac, type: 3}
   bossExitTileLength: 23.15
   bossExitTileRotationY: 180
   bossExitTileXOffset: -1
@@ -4112,7 +4114,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1320799480
 RectTransform:
   m_ObjectHideFlags: 0
