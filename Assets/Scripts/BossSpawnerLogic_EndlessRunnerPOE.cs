@@ -70,19 +70,32 @@ public class BossSpawnerLogic_EndlessRunnerPOE : MonoBehaviour
 
         currentBoss = Instantiate(bossPrefab, spawnPosition, Quaternion.identity);
 
-        LevelBossOne_Logic_EndlessRunnerPOE bossLogic =
-            currentBoss.GetComponent<LevelBossOne_Logic_EndlessRunnerPOE>();
+        LevelBossTwo_Logic_EndlessRunnerPOE bossTwoLogic =
+    currentBoss.GetComponent<LevelBossTwo_Logic_EndlessRunnerPOE>();
 
-        if (bossLogic != null)
+        if (bossTwoLogic != null)
         {
-            bossLogic.player = player;
-            bossLogic.startY = riseStartY;
-            bossLogic.finalY = finalBossY;
-            bossLogic.BeginRise();
+            bossTwoLogic.player = player;
+            bossTwoLogic.startY = riseStartY;
+            bossTwoLogic.finalY = finalBossY;
+            bossTwoLogic.BeginRise();
         }
         else
         {
-            Debug.LogError("BossSpawner: Spawned boss is missing LevelBossOne_Logic_EndlessRunnerPOE.");
+            LevelBossOne_Logic_EndlessRunnerPOE bossOneLogic =
+                currentBoss.GetComponent<LevelBossOne_Logic_EndlessRunnerPOE>();
+
+            if (bossOneLogic != null)
+            {
+                bossOneLogic.player = player;
+                bossOneLogic.startY = riseStartY;
+                bossOneLogic.finalY = finalBossY;
+                bossOneLogic.BeginRise();
+            }
+            else
+            {
+                Debug.LogError("BossSpawner: Spawned boss is missing a supported boss logic script.");
+            }
         }
 
         if (bossEnvironment != null)

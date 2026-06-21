@@ -4114,7 +4114,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1320799480
 RectTransform:
   m_ObjectHideFlags: 0
@@ -4205,7 +4205,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5f97b03646f4cda41a18d2ad481008e6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  bossPrefab: {fileID: 1583986333556517968, guid: b155acb13a164bb40af8e3b56b5c37da, type: 3}
+  bossPrefab: {fileID: 1583986333556517968, guid: c4b567674120462449de588590abaa59, type: 3}
   player: {fileID: 110779113}
   bossEnvironment: {fileID: 17178706}
   floorSpawner: {fileID: 717489216}
