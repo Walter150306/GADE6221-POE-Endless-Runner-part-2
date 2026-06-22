@@ -1,6 +1,8 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.SocialPlatforms.Impl;
+using static UnityEngine.LowLevelPhysics2D.PhysicsLayers;
 
 public class GameManagerLogic_EndlessRunner : MonoBehaviour
 {
@@ -270,4 +272,6 @@ public class GameManagerLogic_EndlessRunner : MonoBehaviour
         Time.timeScale = 1f;
         SceneManager.LoadScene("Main menu");
     }
+
+    
 }
