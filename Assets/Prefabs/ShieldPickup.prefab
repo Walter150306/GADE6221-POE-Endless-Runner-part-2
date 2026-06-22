@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 5716863357111343625}
   - component: {fileID: 3077649385410078757}
   - component: {fileID: 7082497908283491441}
+  - component: {fileID: 3630130333618050659}
   m_Layer: 0
   m_Name: ShieldPickup
   m_TagString: Untagged
@@ -47,8 +48,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fd4623af29519a14a9ca895ca8a5b7f6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PickUpLogic_EndlessRunnerPOE
+  pickupType: 0
   pickupSpeed: 5
-  rotateSpeed: 100
+  bobHeight: 0.2
+  bobSpeed: 3
 --- !u!65 &7082497908283491441
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -70,6 +73,33 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 2.1037207, y: 2.0168142, z: 2.0631886}
   m_Center: {x: 0.14168692, y: 0.090640545, z: -2.2315454}
+--- !u!54 &3630130333618050659
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 343992076784320694}
+  serializedVersion: 5
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!1001 &656222083831392833
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -214,6 +244,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Ice Tunnel Penguin Game Shield Cube
       objectReference: {fileID: 0}
+    - target: {fileID: 6028915098724614564, guid: eedfa3a501db85047b376a0d81d641b7, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: d1660671ebf00f044979a80cbabe50be, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

@@ -240,6 +240,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -8102906448140595485, guid: 80b8fcefc9a9a544ca3e455e64fb3a0c, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: ed57a31a3a9bdce4f839c9c158c68e8d, type: 2}
     - target: {fileID: 919132149155446097, guid: 80b8fcefc9a9a544ca3e455e64fb3a0c, type: 3}
       propertyPath: m_Name
       value: Fish Pickup
