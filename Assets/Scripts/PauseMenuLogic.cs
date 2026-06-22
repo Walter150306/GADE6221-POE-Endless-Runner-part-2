@@ -95,7 +95,11 @@ public class PauseMenuLogic : MonoBehaviour
     public void RestartLevel()
     {
         Time.timeScale = 1f;
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+
+        RunProgressManager.Instance.StartNewRun();
+        GameEventManager.Instance.ResetRunMetrics();
+
+        SceneManager.LoadScene("Level 1");
     }
 
     public void BackToMainMenu()

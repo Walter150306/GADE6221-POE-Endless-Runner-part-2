@@ -288,7 +288,7 @@ public class GameManagerLogic_EndlessRunner : MonoBehaviour
         RunProgressManager.Instance.StartNewRun();
         GameEventManager.Instance.ResetRunMetrics();
 
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        SceneManager.LoadScene("Level 1");
     }
 
     public void BackToMainMenu()

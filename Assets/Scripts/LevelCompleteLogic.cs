@@ -160,7 +160,7 @@ public class LevelCompleteLogic : MonoBehaviour
         RunProgressManager.Instance.StartNewRun();
         GameEventManager.Instance.ResetRunMetrics();
 
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        SceneManager.LoadScene("Level 1");
     }
 
     public void BackToMainMenu()
