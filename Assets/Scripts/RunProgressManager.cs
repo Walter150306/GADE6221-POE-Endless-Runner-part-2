@@ -107,27 +107,34 @@ public class RunProgressManager : MonoBehaviour
             completedLevel2 = true;
         }
 
-        // First required progression: Level 1 must lead to Level 2.
-        if (completedLevel1 && !completedLevel2)
+        // First required progression:
+        // Player must complete Level 1 before Level 2.
+        if (completedSceneName == "Level 1" && !completedLevel2)
         {
-            Debug.Log("RunProgressManager: Level 1 complete. Loading Level 2.");
+            Debug.Log("RunProgressManager: First Level 1 complete. Loading Level 2.");
             return "Level 2";
         }
 
-        // Safety: if somehow Level 2 was played first, force Level 1 next.
-        if (!completedLevel1)
+        // If Level 2 has just been completed, looping starts by going back to Level 1.
+        if (completedSceneName == "Level 2")
         {
-            Debug.Log("RunProgressManager: Level 1 was not completed yet. Loading Level 1.");
+            loopingUnlocked = completedLevel1 && completedLevel2;
+
+            Debug.Log("RunProgressManager: Level 2 complete. Loading Level 1.");
             return "Level 1";
         }
 
-        // After Level 1 and Level 2 are both complete, looping begins.
-        loopingUnlocked = true;
+        // If Level 1 is completed after looping has started, go to Level 2.
+        if (completedSceneName == "Level 1" && completedLevel2)
+        {
+            loopingUnlocked = true;
 
-        string nextScene = Random.value < 0.5f ? "Level 1" : "Level 2";
+            Debug.Log("RunProgressManager: Looping active. Loading Level 2.");
+            return "Level 2";
+        }
 
-        Debug.Log("RunProgressManager: Looping unlocked. Next scene = " + nextScene);
-
-        return nextScene;
+        // Safety fallback.
+        Debug.LogWarning("RunProgressManager: Unexpected progression state. Loading Level 1.");
+        return "Level 1";
     }
 }
