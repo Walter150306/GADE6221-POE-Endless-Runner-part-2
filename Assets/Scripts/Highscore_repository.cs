@@ -4,10 +4,10 @@ using SQLite4Unity3d;
 using UnityEngine;
 using System.Linq;
 
-public class HighscoreRepository : MonoBehaviour 
+public class HighscoreRepository 
 {
     private readonly SQLiteConnection _db;
-
+    
     public HighscoreRepository()
     {
         var dbPath = Path.Combine(Application.persistentDataPath, "game.db");
@@ -81,6 +81,18 @@ public class HighscoreRepository : MonoBehaviour
     {
         _db.DeleteAll<HighScore>();
     }
+    public void SaveHighScoreFromGameState()
+{
+    var state = LoadGameState();
+    if (string.IsNullOrEmpty(state.PlayerName))
+    {
+        Debug.LogWarning("[HighscoreRepository] Player name not set, using 'Anonymous'.");
+        state.PlayerName = "Anonymous";
+    }
+
+    SaveHighScore(state.PlayerName, state.CurrentScore, state.LevelReached);
+    Debug.Log($"[HighscoreRepository] High score saved for {state.PlayerName} with {state.CurrentScore} points at level {state.LevelReached}.");
+}
 
     public void Close()
     {

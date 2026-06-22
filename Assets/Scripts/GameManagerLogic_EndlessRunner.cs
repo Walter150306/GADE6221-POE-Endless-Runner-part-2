@@ -7,6 +7,7 @@ using static UnityEngine.LowLevelPhysics2D.PhysicsLayers;
 public class GameManagerLogic_EndlessRunner : MonoBehaviour
 {
     public static GameManagerLogic_EndlessRunner instance;
+    private HighscoreRepository _repo;
 
     [Header("Game Settings")]
     public int lives = 3;
@@ -44,7 +45,21 @@ public class GameManagerLogic_EndlessRunner : MonoBehaviour
         {
             Destroy(gameObject);
         }
+
+        
+        
+        _repo = new HighscoreRepository();
+        try
+        {
+            _repo = new HighscoreRepository();
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogError($"[GameManager] Failed to initialize DB: {ex}");
+            _repo = null;
+        }
     }
+
 
     void Start()
     {
@@ -232,6 +247,15 @@ public class GameManagerLogic_EndlessRunner : MonoBehaviour
         {
             hudLogic.AddScore(finalAmount);
         }
+        if (_repo != null)
+        {
+            // get current HUD values defensively
+            int currentScore = hudLogic != null ? hudLogic.score : 0;
+            int currentLevel = /* your level tracking variable or 1 */ 1;
+            string playerName = ""; // obtain from your UI or GameState if you store it
+
+            _repo.UpdateGameState(currentScore, currentLevel, playerName);
+        }
     }
 
     void GameOver()
@@ -257,8 +281,28 @@ public class GameManagerLogic_EndlessRunner : MonoBehaviour
         }
 
         Time.timeScale = 0f;
+        
+        if (_repo != null)
+        {
+            // Try to use GameState if present, otherwise build from local values
+            var state = _repo.LoadGameState();
+            if (state == null)
+            {
+                // fallback values
+                string playerName = "Anonymous";
+                int levelReached = 1;
+                _repo.SaveHighScore(playerName, finalScore, levelReached);
+            }
+            else
+            {
+                // ensure player name fallback
+                if (string.IsNullOrEmpty(state.PlayerName)) state.PlayerName = "Anonymous";
+                _repo.SaveHighScore(state.PlayerName, finalScore, state.LevelReached);
+            }
+        }
 
         Debug.Log("Game Over screen shown.");
+        
     }
 
     public void RestartLevel()
@@ -272,6 +316,20 @@ public class GameManagerLogic_EndlessRunner : MonoBehaviour
         Time.timeScale = 1f;
         SceneManager.LoadScene("Main menu");
     }
+    //database methods
+    public void SaveHighScoreButton()
+    {
+        var state = _repo.LoadGameState();
+        _repo.SaveHighScore(state.PlayerName, state.CurrentScore, state.LevelReached);
+        Debug.Log("[GameManager] High score saved!");
+    }
 
-    
+    public void ShowLeaderboardButton()
+    {
+        var scores = _repo.GetTopScores(10);
+        foreach (var hs in scores)
+        {
+            Debug.Log($"{hs.PlayerName} - {hs.Score} (Lvl {hs.LevelReached})");
+        }
+    }
 }
