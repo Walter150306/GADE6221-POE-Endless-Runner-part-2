@@ -201,6 +201,26 @@ public class DatabaseManager : MonoBehaviour
             "\nBosses Beaten: " + bossesBeaten;
     }
 
+    public void ClearSavedScoresButton()
+    {
+        if (repository == null)
+        {
+            CreateRepository();
+        }
+
+        if (repository == null)
+        {
+            Debug.LogError("[DatabaseManager] Cannot clear scores because repository is missing.");
+            return;
+        }
+
+        repository.ClearScores();
+
+        Debug.Log("[DatabaseManager] Cleared all saved high scores.");
+
+        RefreshLeaderboardText();
+    }
+
     void OnDestroy()
     {
         if (repository != null)
