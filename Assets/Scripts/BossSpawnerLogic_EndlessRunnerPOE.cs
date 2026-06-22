@@ -128,6 +128,11 @@ public class BossSpawnerLogic_EndlessRunnerPOE : MonoBehaviour
         }
 
         Debug.Log("BossSpawner: Boss started. Water mode ON.");
+
+        if (SoundManager.Instance != null)
+        {
+            SoundManager.Instance.PlayBossSpawn();
+        }
     }
 
     public void EndBossFight()
@@ -174,6 +179,11 @@ public class BossSpawnerLogic_EndlessRunnerPOE : MonoBehaviour
         if (hudLogic != null)
         {
             hudLogic.UpdateBossStatus("Boss: Complete");
+        }
+
+        if (SoundManager.Instance != null)
+        {
+            SoundManager.Instance.PlayBossDefeated();
         }
     }
 }

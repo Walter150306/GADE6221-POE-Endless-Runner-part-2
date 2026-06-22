@@ -85,7 +85,10 @@ public class LevelCompleteLogic : MonoBehaviour
     void CompleteLevel()
     {
         completedLevel = true;
-
+        if (SoundManager.Instance != null)
+        {
+            SoundManager.Instance.PlayLevelComplete();
+        }
         GameEventManager.Instance.LevelBeaten();
 
         string completedSceneName = SceneManager.GetActiveScene().name;

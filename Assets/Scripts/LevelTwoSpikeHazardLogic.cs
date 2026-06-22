@@ -28,6 +28,10 @@ public class LevelTwoSpikeHazardLogic : MonoBehaviour
 
     IEnumerator Start()
     {
+        if (SoundManager.Instance != null)
+        {
+            SoundManager.Instance.PlaySpikeAttack();
+        }
         Vector3 visiblePosition = transform.position;
         Vector3 hiddenPosition = visiblePosition + Vector3.down * hiddenDepth;
 

@@ -79,6 +79,11 @@ public class PickUpLogic_EndlessRunnerPOE : MonoBehaviour
             return;
         }
 
+        if (SoundManager.Instance != null)
+        {
+            SoundManager.Instance.PlayPickup();
+        }
+
         switch (pickupType)
         {
             case PickupType.Shield:

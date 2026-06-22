@@ -200,10 +200,19 @@ public class GameManagerLogic_EndlessRunner : MonoBehaviour
             }
 
             Debug.Log("Shield blocked the hit");
+
+            if (SoundManager.Instance != null)
+            {
+                SoundManager.Instance.PlayShieldBlock();
+            }
             return;
         }
 
         lives--;
+        if (SoundManager.Instance != null)
+        {
+            SoundManager.Instance.PlayHit();
+        }
         RunProgressManager.Instance.SetLives(lives);
 
         if (hudLogic != null)
@@ -265,6 +274,11 @@ public class GameManagerLogic_EndlessRunner : MonoBehaviour
         Time.timeScale = 0f;
 
         Debug.Log("Game Over screen shown.");
+
+        if (SoundManager.Instance != null)
+        {
+            SoundManager.Instance.PlayGameOver();
+        }
     }
 
     public void RestartLevel()
