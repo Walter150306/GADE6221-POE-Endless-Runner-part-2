@@ -2,7 +2,20 @@ using UnityEngine;
 
 public class GameEventManager : MonoBehaviour
 {
-    public static GameEventManager Instance { get; private set; }
+    private static GameEventManager instance;
+
+    public static GameEventManager Instance
+    {
+        get
+        {
+            if (instance == null)
+            {
+                CreateInstance();
+            }
+
+            return instance;
+        }
+    }
 
     [Header("Run Metrics")]
     public int obstaclesPassed = 0;
@@ -19,15 +32,30 @@ public class GameEventManager : MonoBehaviour
 
     public int levelsBeaten = 0;
 
-    void Awake()
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+    private static void Bootstrap()
     {
-        if (Instance != null && Instance != this)
+        if (instance == null)
+        {
+            CreateInstance();
+        }
+    }
+
+    private static void CreateInstance()
+    {
+        GameObject managerObject = new GameObject("GameEventManager");
+        managerObject.AddComponent<GameEventManager>();
+    }
+
+    private void Awake()
+    {
+        if (instance != null && instance != this)
         {
             Destroy(gameObject);
             return;
         }
 
-        Instance = this;
+        instance = this;
         DontDestroyOnLoad(gameObject);
     }
 

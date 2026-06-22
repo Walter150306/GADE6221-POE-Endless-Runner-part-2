@@ -1,3 +1,4 @@
+using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -8,9 +9,12 @@ public class LevelCompleteLogic : MonoBehaviour
     public float stopSpawningTime = 110f;
     public float levelCompleteTime = 120f;
 
-    [Header("Level Looping")]
+    [Header("Level Display")]
     public string currentLevelDisplayName = "Level 1";
-    public string nextSceneName = "Level 2";
+
+    [Header("Auto Level Transition")]
+    public bool autoLoadNextLevel = true;
+    public float autoLoadDelay = 1.5f;
 
     [Header("References")]
     public ObstacleSpawnerLogic obstacleSpawner;
@@ -26,6 +30,7 @@ public class LevelCompleteLogic : MonoBehaviour
 
     private bool stoppedSpawning = false;
     private bool completedLevel = false;
+    private string resolvedNextSceneName = "Level 2";
 
     void Start()
     {
@@ -80,10 +85,13 @@ public class LevelCompleteLogic : MonoBehaviour
     void CompleteLevel()
     {
         completedLevel = true;
-        if (GameEventManager.Instance != null)
-        {
-            GameEventManager.Instance.LevelBeaten();
-        }
+
+        GameEventManager.Instance.LevelBeaten();
+
+        string completedSceneName = SceneManager.GetActiveScene().name;
+        resolvedNextSceneName =
+            RunProgressManager.Instance.RegisterLevelCompleteAndGetNextScene(completedSceneName);
+
         if (playerLogic != null)
         {
             playerLogic.enabled = false;
@@ -98,12 +106,16 @@ public class LevelCompleteLogic : MonoBehaviour
 
         if (levelCompleteText != null)
         {
-            levelCompleteText.text = currentLevelDisplayName + " Completed!";
+            levelCompleteText.text =
+                currentLevelDisplayName +
+                " Completed!\nLoading " +
+                resolvedNextSceneName +
+                "...";
         }
 
-        if (finalScoreText != null && hudLogic != null)
+        if (finalScoreText != null)
         {
-            finalScoreText.text = "Final Score: " + hudLogic.score;
+            finalScoreText.text = "Current Score: " + RunProgressManager.Instance.currentScore;
         }
 
         if (levelCompletePanel != null)
@@ -113,30 +125,47 @@ public class LevelCompleteLogic : MonoBehaviour
 
         Time.timeScale = 0f;
 
-        Debug.Log("LevelCompleteLogic: " + currentLevelDisplayName + " complete.");
+        Debug.Log(
+            "LevelCompleteLogic: " +
+            currentLevelDisplayName +
+            " complete. Loading " +
+            resolvedNextSceneName
+        );
+
+        if (autoLoadNextLevel)
+        {
+            StartCoroutine(AutoLoadNextLevelAfterDelay());
+        }
+    }
+
+    IEnumerator AutoLoadNextLevelAfterDelay()
+    {
+        yield return new WaitForSecondsRealtime(autoLoadDelay);
+        LoadNextLevel();
     }
 
     public void LoadNextLevel()
     {
-        if (string.IsNullOrWhiteSpace(nextSceneName))
-        {
-            Debug.LogError("LevelCompleteLogic: Next Scene Name is empty.");
-            return;
-        }
-
         Time.timeScale = 1f;
-        SceneManager.LoadScene(nextSceneName);
+        SceneManager.LoadScene(resolvedNextSceneName);
     }
 
     public void RestartLevel()
     {
         Time.timeScale = 1f;
+
+        RunProgressManager.Instance.StartNewRun();
+        GameEventManager.Instance.ResetRunMetrics();
+
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
     public void BackToMainMenu()
     {
         Time.timeScale = 1f;
+
+        RunProgressManager.Instance.EndRun();
+
         SceneManager.LoadScene("Main menu");
     }
 }

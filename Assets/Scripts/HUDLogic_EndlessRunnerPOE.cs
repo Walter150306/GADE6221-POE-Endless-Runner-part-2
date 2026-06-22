@@ -37,6 +37,12 @@ public class HUDLogic_EndlessRunnerPOE : MonoBehaviour
         UpdateScore();
     }
 
+    public void SetScore(int newScore)
+    {
+        score = newScore;
+        UpdateScore();
+    }
+
     void UpdateScore()
     {
         if (scoreText != null)

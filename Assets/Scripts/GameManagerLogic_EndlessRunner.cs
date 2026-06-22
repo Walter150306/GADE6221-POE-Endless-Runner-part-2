@@ -48,7 +48,10 @@ public class GameManagerLogic_EndlessRunner : MonoBehaviour
     {
         Time.timeScale = 1f;
 
-        lives = 3;
+        RunProgressManager.Instance.EnsureRunStarted();
+
+        lives = RunProgressManager.Instance.currentLives;
+
         hasShield = false;
         isGameOver = false;
 
@@ -65,6 +68,7 @@ public class GameManagerLogic_EndlessRunner : MonoBehaviour
 
         if (hudLogic != null)
         {
+            hudLogic.SetScore(RunProgressManager.Instance.currentScore);
             hudLogic.UpdateLives(lives);
             hudLogic.UpdateShield(false);
             hudLogic.UpdateDoublePoints(false, 0f);
@@ -200,6 +204,7 @@ public class GameManagerLogic_EndlessRunner : MonoBehaviour
         }
 
         lives--;
+        RunProgressManager.Instance.SetLives(lives);
 
         if (hudLogic != null)
         {
@@ -226,9 +231,11 @@ public class GameManagerLogic_EndlessRunner : MonoBehaviour
             finalAmount *= 2;
         }
 
+        RunProgressManager.Instance.AddScore(finalAmount);
+
         if (hudLogic != null)
         {
-            hudLogic.AddScore(finalAmount);
+            hudLogic.SetScore(RunProgressManager.Instance.currentScore);
         }
     }
 
@@ -236,11 +243,10 @@ public class GameManagerLogic_EndlessRunner : MonoBehaviour
     {
         isGameOver = true;
 
-        int finalScore = 0;
+        int finalScore = RunProgressManager.Instance.currentScore;
 
         if (hudLogic != null)
         {
-            finalScore = hudLogic.score;
             hudLogic.ShowGameOver();
         }
 
@@ -254,6 +260,8 @@ public class GameManagerLogic_EndlessRunner : MonoBehaviour
             gameOverPanel.SetActive(true);
         }
 
+        RunProgressManager.Instance.EndRun();
+
         Time.timeScale = 0f;
 
         Debug.Log("Game Over screen shown.");
@@ -262,12 +270,19 @@ public class GameManagerLogic_EndlessRunner : MonoBehaviour
     public void RestartLevel()
     {
         Time.timeScale = 1f;
+
+        RunProgressManager.Instance.StartNewRun();
+        GameEventManager.Instance.ResetRunMetrics();
+
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
     public void BackToMainMenu()
     {
         Time.timeScale = 1f;
+
+        RunProgressManager.Instance.EndRun();
+
         SceneManager.LoadScene("Main menu");
     }
 }
