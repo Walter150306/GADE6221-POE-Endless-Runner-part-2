@@ -269,6 +269,11 @@ public class GameManagerLogic_EndlessRunner : MonoBehaviour
             gameOverPanel.SetActive(true);
         }
 
+        if (DatabaseManager.Instance != null)
+        {
+            DatabaseManager.Instance.UpdateGameOverMetricsText();
+        }
+
         RunProgressManager.Instance.EndRun();
 
         Time.timeScale = 0f;
@@ -285,8 +290,15 @@ public class GameManagerLogic_EndlessRunner : MonoBehaviour
     {
         Time.timeScale = 1f;
 
-        RunProgressManager.Instance.StartNewRun();
-        GameEventManager.Instance.ResetRunMetrics();
+        if (RunProgressManager.Instance != null)
+        {
+            RunProgressManager.Instance.StartNewRun();
+        }
+
+        if (GameEventManager.Instance != null)
+        {
+            GameEventManager.Instance.ResetRunMetrics();
+        }
 
         SceneManager.LoadScene("Level 1");
     }
@@ -295,7 +307,10 @@ public class GameManagerLogic_EndlessRunner : MonoBehaviour
     {
         Time.timeScale = 1f;
 
-        RunProgressManager.Instance.EndRun();
+        if (RunProgressManager.Instance != null)
+        {
+            RunProgressManager.Instance.EndRun();
+        }
 
         SceneManager.LoadScene("Main menu");
     }
